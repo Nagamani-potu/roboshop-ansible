@@ -16,8 +16,8 @@
     ansible.builtin.service:
       name: mongod started
       state: started
-      enable: yes
-      
+      enabled: yes
+
   - name: allow remote connections
     ansible.builtin.replace:
       path: /etc/mongod.conf
