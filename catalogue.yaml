@@ -51,12 +51,12 @@
       src: mongodb.repo
       dest: /etc/yum.repos.d/mongodb.repo
 
-   - name: install mongodb client
-     ansible.builtin.package:
+  - name: install mongodb client
+    ansible.builtin.package:
       name: mongodb-org-shell
       state: present
   
-   - name: get the categories count
+  - name: get the categories count
     ansible.builtin.command:  mongo --host mongodb.devopstraining.space --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
     register: product_count
 
