@@ -36,13 +36,13 @@
       remote_src: yes
 
   - name: install dependencies
-    ansible.builtin.command: mvn clean package
-    args:
+    ansible.builtin.command:
+      cmd: mvn clean package
       chdir: /app
 
   - name: rename jar file
-    ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
-    args:
+    ansible.builtin.command:
+      cmd: mv target/shipping-1.0.jar shipping.jar
       chdir: /app
 
   - name: copy shipping service
@@ -70,15 +70,15 @@
       msg: "schema output: {{ schema.stdout }}"
 
   - name: Load schema.sql
-    ansible.builtin.command: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/schema.sql
+    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/schema.sql
     when: schema.stdout != "1"
 
   - name: Load app-user.sql
-    ansible.builtin.command: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/app-user.sql
+    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/app-user.sql
     when: schema.stdout != "1"
 
   - name: Load master-data.sql
-    ansible.builtin.command: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/master-data.sql
+    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/master-data.sql
     when: schema.stdout != "1"
 
   - name: load cities data
@@ -90,5 +90,3 @@
       name: shipping
       state: restarted
       enabled: yes
-
-
