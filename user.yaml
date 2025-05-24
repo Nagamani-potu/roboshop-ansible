@@ -35,17 +35,14 @@
     args:
       chdir: /app
   
-  - name: Copy user service
+    - name: Copy user service
     ansible.builtin.copy:
-     src: user.service
-     dest: /etc/systemd/system/user.service
+      src: user.service
+      dest: /etc/systemd/system/user.service
 
-
-  - name: daemon reload and start 
-    ansible.builtin.systemd_service:
+  - name: Reload systemd
+    ansible.builtin.systemd:
       daemon_reload: true
-
-    # lets start after the data is loaded
 
   - name: copy mongodb repo
     ansible.builtin.copy:
@@ -56,19 +53,17 @@
     ansible.builtin.package:
       name: mongodb-org-shell
       state: present
-  
-  - name: get the categories count
-    ansible.builtin.command:  mongo --host mongodb.devopstraining.space --quiet --eval 'db = db.getSiblingDB("user"); db.products.count()'
-    register: product_count
 
-  # - name: print the count
-  #   ansible.builtin.debug:
-  #     msg: "product count: {{user_count}}"
+  - name: get the categories count
+    ansible.builtin.command: mongo --host mongodb.devopstraining.space --quiet --eval 'db = db.getSiblingDB("user"); db.products.count()'
+    register: product_count
 
   - name: load user data
     ansible.builtin.command: mongo --host mongodb.devopstraining.space < /app/schema/user.js
-    when: product_count.stdout == "0" # keep double quotes
+    when: product_count.stdout == "0"
 
   - name: start and enable user
     ansible.builtin.service:
       name: user
+      state: started
+      enabled: yes
