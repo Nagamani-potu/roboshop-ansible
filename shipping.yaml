@@ -4,6 +4,7 @@
   vars:
     mysql_host: mysql.devopstraining.space
     mysql_root_password: RoboShop@1
+
   tasks:
   - name: install maven
     ansible.builtin.dnf:
@@ -27,7 +28,7 @@
   - name: download application
     ansible.builtin.get_url:
       url: https://roboshop-builds.s3.amazonaws.com/shipping.zip
-      dest: /tmp
+      dest: /tmp/shipping.zip
 
   - name: extract shipping application
     ansible.builtin.unarchive:
@@ -70,19 +71,23 @@
       msg: "schema output: {{ schema.stdout }}"
 
   - name: Load schema.sql
-    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/schema.sql
+    ansible.builtin.command: >
+      mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/schema.sql
     when: schema.stdout != "1"
 
   - name: Load app-user.sql
-    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/app-user.sql
+    ansible.builtin.command: >
+      mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/app-user.sql
     when: schema.stdout != "1"
 
   - name: Load master-data.sql
-    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/master-data.sql
+    ansible.builtin.command: >
+      mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/master-data.sql
     when: schema.stdout != "1"
 
   - name: load cities data
-    ansible.builtin.shell: mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/schema/shipping.sql
+    ansible.builtin.shell: >
+      mysql -h {{ mysql_host }} -uroot -p{{ mysql_root_password }} < /app/db/shipping.sql
     when: schema.stdout != "1"
 
   - name: start and enable shipping
